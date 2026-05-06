@@ -26,4 +26,4 @@ RUN useradd -m -d /home/container container
 WORKDIR /home/container
 USER container
 
-CMD ["/bin/bash"]
+CMD ["bash", "start.sh"]
