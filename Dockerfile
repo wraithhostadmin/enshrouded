@@ -16,14 +16,17 @@ RUN mkdir -p /opt/steamcmd \
     && curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" \
     | tar -zxvf - -C /opt/steamcmd
 
-# GE-Proton inside SteamCMD compatibility tools
-RUN mkdir -p /opt/steamcmd/compatibilitytools.d/GE-Proton${GE_PROTON_VERSION} \
-    && curl -sqL "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton${GE_PROTON_VERSION}/GE-Proton${GE_PROTON_VERSION}.tar.gz" \
-    | tar -zxvf - -C /opt/steamcmd/compatibilitytools.d/GE-Proton${GE_PROTON_VERSION} --strip-components=1
+# Bootstrap SteamCMD to create linux64 directory and steamclient.so
+RUN /opt/steamcmd/steamcmd.sh +quit || true
 
 # Steam SDK symlinks — fixes Steamworks initialization
 RUN ln -s /opt/steamcmd/linux64/steamclient.so /usr/lib/x86_64-linux-gnu/steamclient.so 2>/dev/null || true \
     && ln -s /opt/steamcmd/linux32/steamclient.so /usr/lib/i386-linux-gnu/steamclient.so 2>/dev/null || true
+
+# GE-Proton inside SteamCMD compatibility tools
+RUN mkdir -p /opt/steamcmd/compatibilitytools.d/GE-Proton${GE_PROTON_VERSION} \
+    && curl -sqL "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton${GE_PROTON_VERSION}/GE-Proton${GE_PROTON_VERSION}.tar.gz" \
+    | tar -zxvf - -C /opt/steamcmd/compatibilitytools.d/GE-Proton${GE_PROTON_VERSION} --strip-components=1
 
 ENV PATH="/opt/steamcmd:${PATH}"
 ENV WINEDEBUG=-all
