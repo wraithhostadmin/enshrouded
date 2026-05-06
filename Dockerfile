@@ -18,19 +18,18 @@ RUN mkdir -p /opt/steamcmd \
     && curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" \
     | tar -zxvf - -C /opt/steamcmd
 
-# GE-Proton
-RUN mkdir -p /opt/proton \
+# GE-Proton — install to home directory so it's writable
+RUN mkdir -p /home/container/proton \
     && curl -sqL "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${PROTON_VERSION}/${PROTON_VERSION}.tar.gz" \
-    | tar -zxvf - -C /opt/proton --strip-components=1
-
-RUN ln -s /opt/proton/proton /usr/local/bin/proton
+    | tar -zxvf - -C /home/container/proton --strip-components=1
 
 ENV PATH="/opt/steamcmd:${PATH}"
-ENV STEAM_COMPAT_CLIENT_INSTALL_PATH=/opt/proton
+ENV STEAM_COMPAT_CLIENT_INSTALL_PATH=/home/container/proton
 ENV STEAM_COMPAT_DATA_PATH=/home/container/.proton
 ENV DISPLAY=:1
 
 RUN useradd -m -d /home/container container
+RUN chown -R container:container /home/container
 WORKDIR /home/container
 USER container
 
